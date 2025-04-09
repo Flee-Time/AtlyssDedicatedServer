@@ -74,7 +74,7 @@ public class Plugin : BaseUnityPlugin
         if (!Application.isBatchMode)
         {
             Logger.LogWarning("Not running in batchmode, DedicatedServer plugin exiting.");
-            //return;
+            return;
         }
 
         string[] args = Environment.GetCommandLineArgs();
