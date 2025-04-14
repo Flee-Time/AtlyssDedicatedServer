@@ -112,6 +112,7 @@ ATLYSS.exe -batchmode -nographics -server -name "CozyHub" -motd "Grab tea and ch
 
 ## 🧪 Troubleshooting
 
+- ❌ **Server disappearing when trying to join?** Make sure you have a character saved in slot 0, or specify a `-hostsave` slot when starting.
 - ❌ **Nothing happens?** Make sure you're running with `-batchmode -nographics -server`
 - ❌ **Can't see the terminal?** Run the game via `cmd.exe` or a `.bat` script
 - ❌ **Server name reset?** Must be under 20 characters
