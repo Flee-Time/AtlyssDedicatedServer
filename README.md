@@ -57,6 +57,7 @@ You **must** include `-batchmode -nographics` before your own custom arguments.
 | Argument             | Description                                                                 |
 |----------------------|-----------------------------------------------------------------------------|
 | `-server`            | Enables dedicated server mode                                               |
+| `-hostsave N`        | Selects the save slot to use for the host character (0–6)                   |
 | `-name "MyServer"`   | Sets the server name (max 20 characters)                                    |
 | `-password "1234"`   | Sets a join password                                                        |
 | `-motd "Message"`    | Sets a Message of the Day                                                   |
@@ -68,8 +69,11 @@ You **must** include `-batchmode -nographics` before your own custom arguments.
 | `-pvp`               | Lobby focus: PvP                                                            |
 | `-social`            | Lobby focus: Social                                                         |
 
+
 > ⚠️ Only one of `-public`, `-private`, or `-friends` can be used.  
-> ⚠️ Only one of `-pve`, `-pvp`, or `-social` can be used.
+> ⚠️ Only one of `-pve`, `-pvp`, or `-social` can be used.  
+> ⚠️ If `-hostsave` is not specified, the server will default to using **save slot 0**.  
+> You must have a valid character in the selected slot.
 
 ---
 

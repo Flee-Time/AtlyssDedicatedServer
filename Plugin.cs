@@ -39,6 +39,7 @@ public class Plugin : BaseUnityPlugin
     private string serverPassword = string.Empty;
     private string serverMOTD = string.Empty;
     private int serverMaxPlayers = 16;
+    private int hostCharSaveSlot = 0;
 
     private bool shouldHostServer = false;
     private bool hostSpawned = false;
@@ -84,6 +85,24 @@ public class Plugin : BaseUnityPlugin
             shouldHostServer = true;
 
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+
+            // Server host char save slot with range check
+            if (int.TryParse(GetArgValue(args, "-hostsave"), out int hostSlot))
+            {
+                if (hostSlot >= 0 && hostSlot <= 6)
+                {
+                    hostCharSaveSlot = hostSlot;
+                }
+                else
+                {
+                    hostCharSaveSlot = 0;
+                    Logger.LogWarning("HostSave must be between 0 and 6. Defaulting to 0.");
+                }
+            }
+            else
+            {
+                hostCharSaveSlot = 0;
+            }
 
             serverName = GetArgValue(args, "-name") ?? "ATLYSS Server";
 
@@ -261,7 +280,7 @@ public class Plugin : BaseUnityPlugin
                 break;
         }
 
-        pdm._characterFile = pdm._characterFiles[0];
+        pdm._characterFile = pdm._characterFiles[hostCharSaveSlot];
 
         SteamLobby._current.HostLobby(lobbyType);
         MainMenuManager._current.Connect_ToServer();
