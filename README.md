@@ -1,5 +1,7 @@
 ﻿# 🖧 ATLYSS Dedicated Server Plugin
 
+**Now updated for the latest ATLYSS version.**
+
 This BepInEx plugin adds **headless dedicated server support** to the game **ATLYSS**, enabling you to run the game in a terminal as a dedicated server — no graphics or UI needed.
 
 > ⚠️ This is for hosting servers only. It will disable itself when the game is being launched normally.
@@ -57,7 +59,7 @@ You **must** include `-batchmode -nographics` before your own custom arguments.
 | Argument             | Description                                                                 |
 |----------------------|-----------------------------------------------------------------------------|
 | `-server`            | Enables dedicated server mode                                               |
-| `-hostsave N`        | Selects the save slot to use for the host character (0–6)                   |
+| `-hostsave N`        | Selects the save slot to use for the host character (0–104)                 |
 | `-name "MyServer"`   | Sets the server name (max 20 characters)                                    |
 | `-password "1234"`   | Sets a join password                                                        |
 | `-motd "Message"`    | Sets a Message of the Day                                                   |
@@ -68,6 +70,7 @@ You **must** include `-batchmode -nographics` before your own custom arguments.
 | `-pve`               | Lobby focus: PvE (default)                                                  |
 | `-pvp`               | Lobby focus: PvP                                                            |
 | `-social`            | Lobby focus: Social                                                         |
+| `-rp`                | Lobby focus: RP                                                             |
 
 
 > ⚠️ Only one of `-public`, `-private`, or `-friends` can be used.  

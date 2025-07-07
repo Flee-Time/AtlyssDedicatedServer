@@ -1,5 +1,8 @@
 ## 📜 Changelog
 
+### v0.0.4
+- Updated mod code to work with the new update of ATLYSS.
+
 ### v0.0.2
 - ➕ **Added `-hostsave` argument** to specify which save slot the server host character uses (range: 0–6).
   - If not provided or out of range, defaults to save slot 0.

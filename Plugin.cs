@@ -26,16 +26,9 @@ public class Plugin : BaseUnityPlugin
         PRIVATE
     }
 
-    public enum LobbyFocusTag : byte
-    {
-        PVE_LOBBY,
-        PVP_LOBBY,
-        SOCIAL
-    }
-
     private string serverName = "ATLYSS Server";
     private LobbyTypeTag serverType = LobbyTypeTag.PUBLIC;
-    private LobbyFocusTag serverFocus = LobbyFocusTag.PVE_LOBBY;
+    private AtlyssSteamLobbyTag serverTag = AtlyssSteamLobbyTag.GAIA;
     private string serverPassword = string.Empty;
     private string serverMOTD = string.Empty;
     private int serverMaxPlayers = 16;
@@ -45,6 +38,8 @@ public class Plugin : BaseUnityPlugin
     private bool hostSpawned = false;
     private bool actionTriggered = false;
     private float timeSinceSpawn = 0f;
+
+    private string playerName = string.Empty;
 
     internal static new ManualLogSource Logger;
 
@@ -59,7 +54,7 @@ public class Plugin : BaseUnityPlugin
         Logger.LogInfo("=== Server Configuration ===");
         Logger.LogInfo($"Server Name      : {serverName}");
         Logger.LogInfo($"Server Type      : {serverType}");
-        Logger.LogInfo($"Server Focus     : {serverFocus}");
+        Logger.LogInfo($"Server Tag       : {serverTag}");
         Logger.LogInfo($"Server Password  : {(string.IsNullOrEmpty(serverPassword) ? "[None]" : serverPassword)}");
         Logger.LogInfo($"Server MOTD      : {(string.IsNullOrEmpty(serverMOTD) ? "[None]" : serverMOTD)}");
         Logger.LogInfo($"Max Players      : {serverMaxPlayers}");
@@ -89,14 +84,14 @@ public class Plugin : BaseUnityPlugin
             // Server host char save slot with range check
             if (int.TryParse(GetArgValue(args, "-hostsave"), out int hostSlot))
             {
-                if (hostSlot >= 0 && hostSlot <= 6)
+                if (hostSlot >= 0 && hostSlot <= 104)
                 {
                     hostCharSaveSlot = hostSlot;
                 }
                 else
                 {
                     hostCharSaveSlot = 0;
-                    Logger.LogWarning("HostSave must be between 0 and 6. Defaulting to 0.");
+                    Logger.LogWarning("HostSave must be between 0 and 104. Defaulting to 0.");
                 }
             }
             else
@@ -138,25 +133,26 @@ public class Plugin : BaseUnityPlugin
             }
 
             // Handle server focus
-            var focusFlags = new[] { "-pve", "-pvp", "-social" }.Where(args.Contains).ToList();
+            var focusFlags = new[] { "-pve", "-pvp", "-social", "-rp" }.Where(args.Contains).ToList();
             if (focusFlags.Count > 1)
             {
                 Logger.LogWarning($"Multiple lobby focus flags detected ({string.Join(", ", focusFlags)}). Defaulting to PVE.");
-                serverFocus = LobbyFocusTag.PVE_LOBBY;
+                serverTag = AtlyssSteamLobbyTag.GAIA;
             }
             else if (focusFlags.Count == 1)
             {
-                serverFocus = focusFlags[0] switch
+                serverTag = focusFlags[0] switch
                 {
-                    "-pve" => LobbyFocusTag.PVE_LOBBY,
-                    "-pvp" => LobbyFocusTag.PVP_LOBBY,
-                    "-social" => LobbyFocusTag.SOCIAL,
-                    _ => LobbyFocusTag.PVE_LOBBY
+                    "-pve" => AtlyssSteamLobbyTag.GAIA,
+                    "-pvp" => AtlyssSteamLobbyTag.DUALOS,
+                    "-social" => AtlyssSteamLobbyTag.NOTH,
+                    "-rp" => AtlyssSteamLobbyTag.LOODIA,
+                    _ => AtlyssSteamLobbyTag.GAIA
                 };
             }
             else
             {
-                serverFocus = LobbyFocusTag.PVE_LOBBY;
+                serverTag = AtlyssSteamLobbyTag.GAIA;
             }
 
             // Max players with range check
@@ -219,14 +215,11 @@ public class Plugin : BaseUnityPlugin
     {
         Logger.LogInfo("[HostSpawnDetector] 30 seconds passed since host spawned — teleporting!");
 
-        //GameObject cameraBase = GameObject.Find("_CameraBase");
-        Player hostPlayer = AtlyssNetworkManager._current._connectedPlayers[0].gameObject.GetComponent<Player>();
+        Player hostPlayer = GameObject.Find("[connID: 0] _player(" + playerName + ")").GetComponent<Player>();
         CharacterController hostCharacterController = hostPlayer.GetComponent<CharacterController>();
 
         hostCharacterController.enabled = false;
         hostPlayer.transform.SetPositionAndRotation(new Vector3(500, 50, 510), new Quaternion(0, 0, 0, 0));
-        //cameraBase.GetComponent<CameraFunction>().enabled = false;
-        //cameraBase.transform.rotation = new Quaternion(0, 0, 0, 0);
         hostCharacterController.enabled = true;
     }
 
@@ -252,7 +245,7 @@ public class Plugin : BaseUnityPlugin
 
         llm._lobbyPasswordInput.text = anm._serverPassword;
         llm._lobbyTypeDropdown.value = (int)serverType;
-        llm._lobbyFocusDropdown.value = (int)serverFocus;
+        llm._hostLobbyRealm = serverTag;
 
         anm._bannedClientList.Clear();
         anm._mutedClientList.Clear();
@@ -280,10 +273,12 @@ public class Plugin : BaseUnityPlugin
                 break;
         }
 
+
+        playerName = pdm._characterFiles[hostCharSaveSlot]._nickName;
         pdm._characterFile = pdm._characterFiles[hostCharSaveSlot];
 
         SteamLobby._current.HostLobby(lobbyType);
-        MainMenuManager._current.Connect_ToServer();
+        MainMenuManager._current._characterSelectManager.Send_CharacterFile();
     }
 
     [HarmonyPatch(typeof(ChatBehaviour), "New_ChatMessage")]
